@@ -89,7 +89,7 @@ void setup()
 
 void loop()
 {
-  getcmd();
+//  getcmd();
 
 }
 
