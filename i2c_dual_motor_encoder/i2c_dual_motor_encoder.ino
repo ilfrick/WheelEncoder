@@ -49,6 +49,9 @@ struct reg_map {
   int16_t yawcmd;  //Yaw command
 };
 
+int16_t rcmdprev = 1500;
+int16_t ycmdprev = 1500;
+
 const int union_size = sizeof(reg_map);
 
 // buffer
@@ -56,6 +59,7 @@ static union {
   reg_map map;
   uint8_t bytes[union_size];
 } _buffer;
+
 
 
 volatile int16_t wheel_1, wheel_2;
@@ -85,12 +89,17 @@ void setup()
 
   // init our device ID
   _buffer.map.id 			= DEVICE_ID;
+
+  //init commands
+  _buffer.map.rollcmd = rcmdprev;
+  _buffer.map.yawcmd = ycmdprev;
 }
 
 void loop()
 {
-//  getcmd();
-
+  //  if (Serial.available() > 0) {
+  //    getcmd();
+  //  }
 }
 
 void changeModeConfig()
@@ -110,45 +119,81 @@ void changeModeConfig()
 
 void getcmd()
 {
+  //  Serial.println("getcmd() called");
+  //  nss.println("getcmd() called");
   if (nss.available() > 0) {
     rycmd = nss.read();
     Serial.println("I received: ");
     Serial.println(rycmd);
+
+    switch (rycmd) {
+      case '0':
+        _buffer.map.rollcmd = 1500;
+        _buffer.map.yawcmd = 1500;
+        rcmdprev = _buffer.map.rollcmd;
+        ycmdprev = _buffer.map.yawcmd;
+        break;
+      case 'o':
+        _buffer.map.rollcmd = 1500;
+        _buffer.map.yawcmd = 1500;
+        rcmdprev = _buffer.map.rollcmd;
+        ycmdprev = _buffer.map.yawcmd;
+        break;
+      case '1':
+        _buffer.map.rollcmd = 1900;
+        _buffer.map.yawcmd = 1500;
+        rcmdprev = _buffer.map.rollcmd;
+        ycmdprev = _buffer.map.yawcmd;
+        break;
+      case '2':
+        _buffer.map.rollcmd = 1100;
+        _buffer.map.yawcmd = 1500;
+        rcmdprev = _buffer.map.rollcmd;
+        ycmdprev = _buffer.map.yawcmd;
+        break;
+      case '3':
+        _buffer.map.rollcmd = 1900;
+        _buffer.map.yawcmd = 1100;
+        rcmdprev = _buffer.map.rollcmd;
+        ycmdprev = _buffer.map.yawcmd;
+        break;
+      case '4':
+        _buffer.map.rollcmd = 1900;
+        _buffer.map.yawcmd = 1900;
+        rcmdprev = _buffer.map.rollcmd;
+        ycmdprev = _buffer.map.yawcmd;
+        break;
+      case '5':
+        _buffer.map.rollcmd = 1100;
+        _buffer.map.yawcmd = 1100;
+        rcmdprev = _buffer.map.rollcmd;
+        ycmdprev = _buffer.map.yawcmd;
+        break;
+      case '6':
+        _buffer.map.rollcmd = 1100;
+        _buffer.map.yawcmd = 1900;
+        rcmdprev = _buffer.map.rollcmd;
+        ycmdprev = _buffer.map.yawcmd;
+        break;
+      default:
+        _buffer.map.rollcmd = rcmdprev;
+        _buffer.map.yawcmd = ycmdprev;
+        break;
+    }
+    givefeedback();
   }
-  switch (rycmd) {
-    case '1':
-      _buffer.map.rollcmd = 1900;
-      _buffer.map.yawcmd = 1500;
-      break;
-    case '2':
-      _buffer.map.rollcmd = 1100;
-      _buffer.map.yawcmd = 1500;
-      break;
-    case '3':
-      _buffer.map.rollcmd = 1900;
-      _buffer.map.yawcmd = 1100;
-      break;
-    case '4':
-      _buffer.map.rollcmd = 1900;
-      _buffer.map.yawcmd = 1900;
-      break;
-    case '5':
-      _buffer.map.rollcmd = 1100;
-      _buffer.map.yawcmd = 1100;
-      break;
-    case '6':
-      _buffer.map.rollcmd = 1100;
-      _buffer.map.yawcmd = 1900;
-      break;
-    default:
-      _buffer.map.rollcmd = 1500;
-      _buffer.map.yawcmd = 1500;
-      break;
-  }
+}
+
+void givefeedback()
+{
   Serial.println("Roll command received: ");
   Serial.println(_buffer.map.rollcmd);
   Serial.println("Yaw command received: ");
   Serial.println(_buffer.map.yawcmd);
+  nss.println("Roll command received: ");
+  nss.println(_buffer.map.rollcmd);
+  nss.println("Yaw command received: ");
+  nss.println(_buffer.map.yawcmd);
 }
 
 void requestEvent()
