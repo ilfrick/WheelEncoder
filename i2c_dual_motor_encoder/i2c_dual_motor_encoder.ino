@@ -194,6 +194,10 @@ void givefeedback()
   nss.println(_buffer.map.rollcmd);
   nss.println("Yaw command received: ");
   nss.println(_buffer.map.yawcmd);
+  nss.println("Wheel 1 speed: ");
+  nss.println(_buffer.map.wheel_1_speed);
+  nss.println("Wheel 2 speed: ");
+  nss.println(_buffer.map.wheel_2_speed);
 }
 
 void requestEvent()
